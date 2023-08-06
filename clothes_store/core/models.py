@@ -13,13 +13,32 @@ class Categories(models.Model):
 
 
 class Product(models.Model):
+    SEX_CHOICES = [
+        ("man", "man"),
+        ("women", "women")
+    ]
     name = models.CharField(max_length=100)
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
-    quantity = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to="product_images")
-    sex = models.CharField(max_length=5)
+    sex = models.CharField(max_length=5,choices=SEX_CHOICES)
     category = models.ForeignKey(Categories, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
+
+
+class ProductSize(models.Model):
+    SIZE_CHOICES = [
+        ('S', 'S'),
+        ('M', 'M'),
+        ('L', 'L'),
+        ('XL', 'XL'),
+    ]
+
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    size = models.CharField(max_length=5, choices=SIZE_CHOICES)
+    quantity = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.size}"

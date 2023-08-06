@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Categories, Product
+from .forms import ProductFilterForm
 
 
 def index(request):
@@ -35,13 +36,21 @@ def about(request):
 
 
 def men_outwear(request):
-    print("START")
     products = Product.objects.filter(sex="man")
-    for product in products:
-        print(product.image.url)
-    print(1)
+    forms = ProductFilterForm(request.GET)
+    size_filter = request.GET.get('size')
+    sort_filter = request.GET.get('sort')
+    if size_filter:
+        products = products.filter(productsize__size=size_filter)
+    print(size_filter)
+    if sort_filter == 'Ascending Price':
+        print("YES")
+        products = products.order_by('price')
+    elif sort_filter == 'Descending Price':
+        products = products.order_by('-price')
     return render(request, "men_outwear.html", context={"products": products,
-                                                        })
+                                                        "forms": forms,
+                                                            })
 
 
 def product_detail(request, product_id):

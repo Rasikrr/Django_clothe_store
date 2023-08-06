@@ -47,24 +47,23 @@
         </ul>
     </div>
 <hr style="color: #000; width: 80%">
-    <div class="filters">
-        <!-- Фильтр по размеру -->
-        <label for="size">Size:</label>
-        <select id="size">
-            <option value="">All</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-        </select>
+     <form method="get" class="filters">
+            <label for="size">Size:</label>
+            <select id="size" name="size">
+                {% for value, label in forms.size.field.choices %}
+                    <option value="{{ value }}" {% if value == request.GET.size %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
 
-        <!-- Фильтр по сортировке -->
-        <label for="sort">Sort:</label>
-        <select id="sort">
-            <option value="ascending">Ascending Price</option>
-            <option value="descending">Descending Price</option>
-        </select>
-    </div>
+            <label for="sort" style="margin-left: 30px">Sort:</label>
+            <select id="sort" name="sort">
+                {% for value, label in forms.sort.field.choices %}
+                    <option value="{{ value }}" {% if value == request.GET.sort %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+
+        <button class="btn-submit" type="submit">Submit</button>
+    </form>
     <h2 class="popular">Outwear</h2>
 <div class="catalog">
     {% for product in products %}
@@ -74,6 +73,8 @@
             <span>{{product.price}}$</span>
             <button class="add-to-cart-btn"><ion-icon name="bag-add-outline"></ion-icon></button>
         </div>
+    {% empty %}
+        <p style="font-size: 24px; margin: 20px 0 0 50px; font-weight: 700">No products found</p>
     {% endfor %}
 </div>
 {% endblock %}
@@ -205,8 +206,8 @@ a{
 }
 
 .product img {
-    max-width: 100%;
-    max-height: 370px;
+    min-width: 100%;
+    max-height: 380px;
 }
 
 .product h3 {
@@ -235,9 +236,38 @@ a{
 .product:hover {
     background-color: #f5f5f5;
 }
-.filters{
-    margin-left: 20vw;
-    column-gap: 20vw;
+.filters {
+  margin:0 0 20px 10vw;
+  padding: 10px;
+  /*border: 1px solid #ccc;*/
+  border-radius: 5px;
+}
+.filters-sorts{
+    margin-right: 50px;
+}
+/* Стили для выпадающего списка */
+select {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Стили для кнопки */
+.btn-submit{
+  padding: 8px 12px;
+  margin-left: 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Стили для кнопки при наведении */
+.btn-submit:hover {
+  background-color: #0056b3;
 }
 </style>
 {% endblock %}
