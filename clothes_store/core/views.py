@@ -3,8 +3,9 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Categories, Product
+from .models import Categories, Product, ProductSize
 from .forms import ProductFilterForm
+from random import sample
 
 
 def index(request):
@@ -20,7 +21,9 @@ def signin(request):
 
 
 def men(request):
-    return render(request, "men.html")
+    products = sample(list(Product.objects.filter(sex="man")), k=3)
+    print(products)
+    return render(request, "men.html", context={"products": products})
 
 
 def women(request):
@@ -55,4 +58,26 @@ def men_outwear(request):
 
 def product_detail(request, product_id):
     product = Product.objects.get(id=product_id)
-    return render(request, "single-product.html", context={"product": product, })
+    sizes = ProductSize.SIZE_CHOICES
+    size = request.GET.get("size")
+    product_size = ""
+    if size:
+        product_size = ProductSize.objects.get(product=product, size=size)
+    return render(request, "single-product.html", context={"product": product,
+                                                           "sizes": sizes,
+                                                           "product_size": product_size})
+
+
+def get_product_size_info(request):
+    if request.method == 'POST':
+        product_id = request.GET.get('product_id')
+        size = request.POST.get('size')
+        if product_id and size:
+            try:
+                product = Product.objects.get(id=product_id)
+                product_size = ProductSize.objects.get(product=product, size=size)
+                availability_message = f"In stock: {product_size.quantity}" if product_size.quantity > 0 else "Out of stock"
+                return JsonResponse({'availability_message': availability_message})
+            except (Product.DoesNotExist, ProductSize.DoesNotExist):
+                pass
+    return JsonResponse({'availability_message': 'Out of stock'})

@@ -31,17 +31,33 @@
                         <div class="right-content">
                             <div class="quantity buttons_added">
                                 <input type="button" value="-" class="minus">
-                                <input type="number" step="1" min="1" max="{{product.quantity}}" name="quantity" value="1" title="Qty" class="input-text qty text" size="4" pattern="" inputmode="">
+                                <input type="number" step="1" min="1" max="{{product_size.quantity}}" name="quantity" value="1" title="Qty" class="input-text qty text" size="4" pattern="" inputmode="">
                                 <input type="button" value="+" class="plus">
                             </div>
                         </div>
                     </div>
+                   <form id="size-form" method="get">
+                        {% csrf_token %}
+                        <label for="size">Size:</label>
+                        <select id="size" name="size">
+                            <option value="">Choose Size</option>
+                            {% for size_choice in sizes %}
+                                <option value="{{ size_choice.0 }}">{{ size_choice.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
                     <div class="total">
-                        {% if product.quantity > 0 %}
-                            <p class="in_stock" style="color: #48ff48; font-weight: 700;">In stock</p>
-                        {% else %}
-                            <p class="out_of_stock" style="color: #ff343f; font-weight: 700;">Out of stock</p>
-                        {% endif %}
+                        <p id="availability-message">
+                            {% if product_size %}
+                                {% if product_size.quantity > 0 %}
+                                    In stock: {{ product_size.quantity }}
+                                {% else %}
+                                    Out of stock
+                                {% endif %}
+                            {% else %}
+                                Please select a size
+                            {% endif %}
+                        </p>
                         <h4 id="total_price">Total: ${{ product.price }}</h4>
                         <div class="main-border-button"><a href="#">Add To Cart</a></div>
                     </div>
@@ -70,46 +86,33 @@
 {% endblock %}
 {% block custom_scripts %}
 <script>
-    // Получаем элементы кнопок "-" и "+", а также поле счетчика и элемент, содержащий общую стоимость (total)
-    const minusButton = document.querySelector('.minus');
-    const plusButton = document.querySelector('.plus');
-    const quantityField = document.querySelector('.qty');
-    const totalElement = document.getElementById('total_price');
-    const productPrice = parseFloat('{{ product.price }}');
-    const quantityInStock = parseInt('{{product.quantity}}')
 
-    // Функция для обновления общей стоимости
-    function updateTotalPrice(quantity) {
-        const total = productPrice * quantity;
-        totalElement.textContent = `Total: $${total.toFixed(2)}`;
-    }
+</script>
+<script>
+    const sizeForm = document.getElementById('size-form');
+    const availabilityMessage = document.getElementById('availability-message');
 
-    // Обработчик события клика на кнопку "-"
-    minusButton.addEventListener('click', function() {
-        let currentValue = parseInt(quantityField.value);
-        if (currentValue > 1) {
-            quantityField.value = currentValue - 1;
-            updateTotalPrice(currentValue - 1);
-        }
-    });
+    // Слушаем событие изменения выбранного размера
+    sizeForm.addEventListener('change', () => {
+        const formData = new FormData(sizeForm);
 
-    // Обработчик события клика на кнопку "+"
-    plusButton.addEventListener('click', function() {
-        let currentValue = parseInt(quantityField.value);
-        if (currentValue < quantityInStock){
-            quantityField.value = currentValue + 1;
-            updateTotalPrice(currentValue + 1);
-        }
-    });
-
-    // Обработчик события изменения значения поля счетчика
-    quantityField.addEventListener('change', function() {
-        let currentValue = parseInt(quantityField.value);
-        if (currentValue < 1) {
-            quantityField.value = 1;
-            currentValue = 1;
-        }
-        updateTotalPrice(currentValue);
+        // Отправляем запрос AJAX для получения информации о наличии товара в соответствии с выбранным размером
+        fetch(`/get_product_size_info/?product_id={{ product.id }}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Обновляем надпись на основе ответа от сервера
+            availabilityMessage.textContent = data.availability_message;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            availabilityMessage.textContent = 'Out of stock';
+        });
     });
 </script>
 {% endblock %}

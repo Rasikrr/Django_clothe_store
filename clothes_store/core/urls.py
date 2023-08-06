@@ -11,6 +11,7 @@ urlpatterns = [
     path("contactus", views.contact, name="contactus"),
     path("aboutus", views.about, name="aboutus"),
     path("men/outwear", views.men_outwear, name="outwear"),
-    path("product/<int:product_id>", views.product_detail, name="product_detail")
+    path("product/<int:product_id>", views.product_detail, name="product_detail"),
+    path('get_product_size_info/', views.get_product_size_info, name='get_product_size_info'),
 
 ]
