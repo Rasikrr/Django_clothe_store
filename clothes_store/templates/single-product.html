@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <!-- ***** Product Area Starts ***** -->
+    <section class="section" id="product">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                <div class="left-images">
+                    <img class="prod_image" src="{{product.image.url}}" alt="{{product.name}}">
+<!--                    <img src="{% static 'assets/images/single-product-02.jpg' %}" alt="">-->
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="right-content">
+                    <h4>{{product.name}}</h4>
+                    <span class="price">{{product.price}}</span>
+                    <ul class="stars">
+                        <li><i class="fa fa-star"></i></li>
+                        <li><i class="fa fa-star"></i></li>
+                        <li><i class="fa fa-star"></i></li>
+                        <li><i class="fa fa-star"></i></li>
+                        <li><i class="fa fa-star"></i></li>
+                    </ul>
+                    <span>{{product.description}}</span>
+                    <div class="quantity-content">
+                        <div class="left-content">
+                            <h6>No. of Orders</h6>
+                        </div>
+                        <div class="right-content">
+                            <div class="quantity buttons_added">
+                                <input type="button" value="-" class="minus">
+                                <input type="number" step="1" min="1" max="{{product.quantity}}" name="quantity" value="1" title="Qty" class="input-text qty text" size="4" pattern="" inputmode="">
+                                <input type="button" value="+" class="plus">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="total">
+                        {% if product.quantity > 0 %}
+                            <p class="in_stock" style="color: #48ff48; font-weight: 700;">In stock</p>
+                        {% else %}
+                            <p class="out_of_stock" style="color: #ff343f; font-weight: 700;">Out of stock</p>
+                        {% endif %}
+                        <h4 id="total_price">Total: ${{ product.price }}</h4>
+                        <div class="main-border-button"><a href="#">Add To Cart</a></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Product Area Ends ***** -->
+{% endblock %}
+
+{% block custom_css%}
+<style>
+    .section{
+        margin-top: 30vh;
+    }
+    #product{
+        margin-top: 150px;
+    }
+    .prod_image{
+        margin-left: 5vw;
+        max-width: 30vw;
+        max-height: 80vh;
+    }
+</style>
+{% endblock %}
+{% block custom_scripts %}
+<script>
+    // Получаем элементы кнопок "-" и "+", а также поле счетчика и элемент, содержащий общую стоимость (total)
+    const minusButton = document.querySelector('.minus');
+    const plusButton = document.querySelector('.plus');
+    const quantityField = document.querySelector('.qty');
+    const totalElement = document.getElementById('total_price');
+    const productPrice = parseFloat('{{ product.price }}');
+    const quantityInStock = parseInt('{{product.quantity}}')
+
+    // Функция для обновления общей стоимости
+    function updateTotalPrice(quantity) {
+        const total = productPrice * quantity;
+        totalElement.textContent = `Total: $${total.toFixed(2)}`;
+    }
+
+    // Обработчик события клика на кнопку "-"
+    minusButton.addEventListener('click', function() {
+        let currentValue = parseInt(quantityField.value);
+        if (currentValue > 1) {
+            quantityField.value = currentValue - 1;
+            updateTotalPrice(currentValue - 1);
+        }
+    });
+
+    // Обработчик события клика на кнопку "+"
+    plusButton.addEventListener('click', function() {
+        let currentValue = parseInt(quantityField.value);
+        if (currentValue < quantityInStock){
+            quantityField.value = currentValue + 1;
+            updateTotalPrice(currentValue + 1);
+        }
+    });
+
+    // Обработчик события изменения значения поля счетчика
+    quantityField.addEventListener('change', function() {
+        let currentValue = parseInt(quantityField.value);
+        if (currentValue < 1) {
+            quantityField.value = 1;
+            currentValue = 1;
+        }
+        updateTotalPrice(currentValue);
+    });
+</script>
+{% endblock %}
