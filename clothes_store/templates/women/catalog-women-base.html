@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <div class="dd-menu">
+<div class="dd-menu">
         <ul class="menu">
             <li class="dropdown">
                 <button class="dropbtn">Clothes</button>
                 <div class="dropdown-content">
-                    <a href="#"><i class="icons fa-sharp fa-light fa-shirt-long-sleeve" style="color: #000000;"></i>Outerwear</a>
+                    <a href="{% url 'women_outwear' %}"><i class="icons fa-sharp fa-light fa-shirt-long-sleeve" style="color: #000000;"></i>Outerwear</a>
                     <a href="#"><i class="icons fa-thin fa-shirt-tank-top" style="color: #000000;"></i>Shirts, tops, T-shirts</a>
                     <a href="#">Pants</a>
                     <a href="#">Shorts</a>
@@ -32,6 +32,7 @@
                     <a href="#"><i class="icons fa-light fa-ring" style="color: #000000;"></i>Rings</a>
                     <a href="#"><i class="icons fa-light fa-coin" style="color: #000000;"></i>Bracelets</a>
                     <a href="#"><i class="icons fa-light fa-glasses" style="color: #000000;"></i>Glasses</a>
+                    <a href="#"><i class="icons fa-light fa-bag-shopping" style="color: #000000;"></i>Bags</a>
                 </div>
             </li>
 
@@ -44,48 +45,36 @@
                 </div>
             </li>
         </ul>
-    </div>
+</div>
 <hr style="color: #000; width: 80%">
-    <h2 class="popular">Popular</h2>
+{% block filters %} {% endblock %}
+{% block category %}
+<h2 class="category">Popular</h2>
+{% endblock %}
     <div class="catalog">
+        {% for product in products %}
         <div class="product">
-            <a href="single-product"><img src="{% static 'assets/images/women-01.jpg'%}" alt="Товар 1"></a>
-            <a href="single-product"><h3>Товар 1</h3></a>
-            <span>50$</span>
+            <a href="{% url 'product_detail' product_id=product.id%}"><img src="{{product.image.url}}" alt="{{product.name}}"></a>
+            <a href="{% url 'product_detail' product_id=product.id%}"><h3>{{product.name}}</h3></a>
+            <span>{{product.price}}$</span>
             <button class="add-to-cart-btn"><ion-icon name="bag-add-outline"></ion-icon></button>
         </div>
-        <div class="product">
-            <img src="{% static 'assets/images/women-01.jpg'%}" alt="Товар 1">
-            <h3>Товар 1</h3>
-            <span>50$</span>
-            <button class="add-to-cart-btn"><ion-icon name="bag-add-outline"></ion-icon></button>
-        </div>
-        <div class="product">
-            <img src="{% static 'assets/images/dress1.jpg'%}" alt="Товар 1">
-            <h3>Товар 1</h3>
-            <span>50$</span>
-            <button class="add-to-cart-btn"><ion-icon name="bag-add-outline"></ion-icon></button>
-        </div>
-        <div class="product">
-            <img src="{% static 'assets/images/women-03.jpg'%}" alt="Товар 1">
-            <h3>Товар 1</h3>
-            <span>50$</span>
-            <button class="add-to-cart-btn"><ion-icon name="bag-add-outline"></ion-icon></button>
-        </div>
+        {% empty %}
+        <p style="font-size: 24px; margin: 20px 0 0 50px; font-weight: 700">No products found</p>
+        {% endfor %}
     </div>
 {% endblock %}
-
 {% block custom_css %}
 <style>
+a{
+    text-decoration: none;
+    color: black;
+}
 .dd-menu{
     margin-top:17vh;
     display: flex;
     justify-content: center;
     margin-left: 10vw;
-}
-a{
-    text-decoration: none;
-    color: black;
 }
 
 .menu {
@@ -179,7 +168,7 @@ a{
     margin-right: 10px;
 }
 
-.popular{
+.category{
     margin: 5vh 0 0 14vw;
 }
 
@@ -202,8 +191,8 @@ a{
 }
 
 .product img {
-    max-width: 100%;
-    height: 390px;
+    min-width: 100%;
+    max-height: 400px;
 }
 
 .product h3 {
@@ -231,6 +220,39 @@ a{
 }
 .product:hover {
     background-color: #f5f5f5;
+}
+.filters {
+  margin:0 0 20px 10vw;
+  padding: 10px;
+  /*border: 1px solid #ccc;*/
+  border-radius: 5px;
+}
+.filters-sorts{
+    margin-right: 50px;
+}
+/* Стили для выпадающего списка */
+select {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Стили для кнопки */
+.btn-submit{
+  padding: 8px 12px;
+  margin-left: 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Стили для кнопки при наведении */
+.btn-submit:hover {
+  background-color: #0056b3;
 }
 </style>
 {% endblock %}

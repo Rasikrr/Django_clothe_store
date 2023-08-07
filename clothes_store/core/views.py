@@ -9,7 +9,9 @@ from random import sample
 
 
 def index(request):
-    return render(request, "index.html")
+    men_products = sample(list(Product.objects.filter(sex="man")), k=4)
+    return render(request, "index.html", context={"men_products": men_products,
+                                                 })
 
 
 def signup(request):
@@ -27,7 +29,9 @@ def men(request):
 
 
 def women(request):
-    return render(request, "women.html")
+    products = sample(list(Product.objects.filter(sex="women")), k=3)
+    return render(request, "women.html", context={"products": products,
+                                                  })
 
 
 def contact(request):
@@ -39,15 +43,15 @@ def about(request):
 
 
 def men_outwear(request):
-    products = Product.objects.filter(sex="man")
+    parent_category = Categories.objects.get(name="Outwear")
+    all_outwear = Categories.objects.filter(parent_category=parent_category)
+    products = Product.objects.filter(sex="man", category__in=all_outwear)
     forms = ProductFilterForm(request.GET)
     size_filter = request.GET.get('size')
     sort_filter = request.GET.get('sort')
     if size_filter:
         products = products.filter(productsize__size=size_filter)
-    print(size_filter)
     if sort_filter == 'Ascending Price':
-        print("YES")
         products = products.order_by('price')
     elif sort_filter == 'Descending Price':
         products = products.order_by('-price')
@@ -56,16 +60,30 @@ def men_outwear(request):
                                                             })
 
 
+def women_outwear(request):
+    parent_category = Categories.objects.get(name="Outwear")
+    all_outwear = Categories.objects.filter(parent_category=parent_category)
+    products = Product.objects.filter(category__in=all_outwear, sex="women")
+    forms = ProductFilterForm(request.GET)
+    size_filter = request.GET.get('size')
+    sort_filter = request.GET.get('sort')
+    if size_filter:
+        products = products.filter(productsize__size=size_filter)
+    if sort_filter == 'Ascending Price':
+        products = products.order_by('price')
+    elif sort_filter == 'Descending Price':
+        products = products.order_by('-price')
+    return render(request, "men_outwear.html", context={"products": products,
+                                                        "forms": forms,
+                                                        })
+
+
 def product_detail(request, product_id):
     product = Product.objects.get(id=product_id)
     sizes = ProductSize.SIZE_CHOICES
-    size = request.GET.get("size")
-    product_size = ""
-    if size:
-        product_size = ProductSize.objects.get(product=product, size=size)
     return render(request, "single-product.html", context={"product": product,
                                                            "sizes": sizes,
-                                                           "product_size": product_size})
+                                                           })
 
 
 def get_product_size_info(request):

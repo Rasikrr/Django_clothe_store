@@ -57,7 +57,9 @@ ROOT_URLCONF = 'clothes_store.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "templates")],
+        'DIRS': [os.path.join(BASE_DIR, "templates"),
+                 os.path.join(BASE_DIR, "templates", "men"),
+                 os.path.join(BASE_DIR, "templates", "women")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

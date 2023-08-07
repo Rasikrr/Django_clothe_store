@@ -48,15 +48,11 @@
                     </form>
                     <div class="total">
                         <p id="availability-message">
-                            {% if product_size %}
                                 {% if product_size.quantity > 0 %}
                                     In stock: {{ product_size.quantity }}
                                 {% else %}
                                     Out of stock
                                 {% endif %}
-                            {% else %}
-                                Please select a size
-                            {% endif %}
                         </p>
                         <h4 id="total_price">Total: ${{ product.price }}</h4>
                         <div class="main-border-button"><a href="#">Add To Cart</a></div>
