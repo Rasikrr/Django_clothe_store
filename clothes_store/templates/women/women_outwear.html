@@ -1,5 +1,36 @@
 {% extends 'catalog-women-base.html' %}
 {% load static %}
+
 {% block category %}
 <h2 class="category">Outwear</h2>
 {% endblock %}
+
+{% block filters %}
+<form method="get" class="filters">
+    {% csrf_token %}
+        <label for="size">Size:</label>
+        <select id="size" name="size">
+            {% for value, label in forms.size.field.choices %}
+                <option value="{{ value }}" {% if value == request.GET.size %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="sort" style="margin-left: 30px">Sort:</label>
+        <select id="sort" name="sort">
+            {% for value, label in forms.sort.field.choices %}
+                <option value="{{ value }}" {% if value == request.GET.sort %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+         <label>Type of Outwear:</label>
+        {% for value, label in forms.type_of_outwear.field.choices %}
+        <div>
+            <input type="checkbox" id="type_{{ forloop.counter }}" name="type_of_outwear" value="{{ value }}" {% if value in request.GET.type_of_outwear %}checked{% endif %}>
+            <label for="type_{{ forloop.counter }}">{{ label }}</label>
+        </div>
+        {% endfor %}
+
+
+    <button class="btn-submit" type="submit">Submit</button>
+</form>
+{% endblock %}
+

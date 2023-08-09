@@ -4,7 +4,7 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Categories, Product, ProductSize
-from .forms import ProductFilterForm
+from .forms import ProductFilterForm, OutwearFilterForm
 from random import sample
 
 
@@ -46,7 +46,7 @@ def men_outwear(request):
     parent_category = Categories.objects.get(name="Outwear")
     all_outwear = Categories.objects.filter(parent_category=parent_category)
     products = Product.objects.filter(sex="man", category__in=all_outwear)
-    forms = ProductFilterForm(request.GET)
+    forms = OutwearFilterForm(request.GET)
     size_filter = request.GET.get('size')
     sort_filter = request.GET.get('sort')
     if size_filter:
@@ -55,16 +55,21 @@ def men_outwear(request):
         products = products.order_by('price')
     elif sort_filter == 'Descending Price':
         products = products.order_by('-price')
+    if forms.is_valid():  # Проверка на валидность формы
+        if forms.cleaned_data['type_of_outwear']:
+            selected_types = forms.cleaned_data['type_of_outwear']
+            products = products.filter(category__name__in=selected_types)
+
     return render(request, "men_outwear.html", context={"products": products,
                                                         "forms": forms,
-                                                            })
+                                                        })
 
 
 def women_outwear(request):
     parent_category = Categories.objects.get(name="Outwear")
     all_outwear = Categories.objects.filter(parent_category=parent_category)
     products = Product.objects.filter(category__in=all_outwear, sex="women")
-    forms = ProductFilterForm(request.GET)
+    forms = OutwearFilterForm(request.GET)
     size_filter = request.GET.get('size')
     sort_filter = request.GET.get('sort')
     if size_filter:
@@ -73,6 +78,11 @@ def women_outwear(request):
         products = products.order_by('price')
     elif sort_filter == 'Descending Price':
         products = products.order_by('-price')
+    if forms.is_valid():  # Проверка на валидность формы
+        if forms.cleaned_data['type_of_outwear']:
+            selected_types = forms.cleaned_data['type_of_outwear']
+            products = products.filter(category__name__in=selected_types)
+
     return render(request, "men_outwear.html", context={"products": products,
                                                         "forms": forms,
                                                         })
@@ -95,7 +105,7 @@ def get_product_size_info(request):
                 product = Product.objects.get(id=product_id)
                 product_size = ProductSize.objects.get(product=product, size=size)
                 availability_message = f"In stock: {product_size.quantity}" if product_size.quantity > 0 else "Out of stock"
-                return JsonResponse({'availability_message': availability_message})
+                return JsonResponse({'availability_message': availability_message, 'max_quantity': product_size.quantity})
             except (Product.DoesNotExist, ProductSize.DoesNotExist):
                 pass
     return JsonResponse({'availability_message': 'Out of stock'})

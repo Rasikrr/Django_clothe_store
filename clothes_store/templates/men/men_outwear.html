@@ -21,6 +21,14 @@
                 <option value="{{ value }}" {% if value == request.GET.sort %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
         </select>
+         <label>Type of Outwear:</label>
+        {% for value, label in forms.type_of_outwear.field.choices %}
+        <div>
+            <input type="checkbox" id="type_{{ forloop.counter }}" name="type_of_outwear" value="{{ value }}" {% if value in request.GET.type_of_outwear %}checked{% endif %}>
+            <label for="type_{{ forloop.counter }}">{{ label }}</label>
+        </div>
+        {% endfor %}
+
 
     <button class="btn-submit" type="submit">Submit</button>
 </form>

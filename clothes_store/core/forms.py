@@ -16,3 +16,12 @@ class ProductFilterForm(forms.Form):
     ]
     size = forms.ChoiceField(choices=SIZE_CHOICES, required=False)
     sort = forms.ChoiceField(choices=SORT_CHOICES, required=False)
+
+
+class OutwearFilterForm(ProductFilterForm):
+    TYPE = [
+        ("Jacket", "Jacket"),
+        ("Coat", "Coat"),
+    ]
+
+    type_of_outwear = forms.MultipleChoiceField(choices=TYPE, required=False)

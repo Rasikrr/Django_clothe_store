@@ -31,7 +31,7 @@
                         <div class="right-content">
                             <div class="quantity buttons_added">
                                 <input type="button" value="-" class="minus">
-                                <input type="number" step="1" min="1" max="{{product_size.quantity}}" name="quantity" value="1" title="Qty" class="input-text qty text" size="4" pattern="" inputmode="">
+                                <input type="number" step="1" min="1" max="1000" name="quantity" value="1" title="Qty" class="input-text qty text" size="4" pattern="" inputmode="" data-max-quantity="{{ product_size.quantity }}" data-product-id="{{ product_id }}" data-size="">
                                 <input type="button" value="+" class="plus">
                             </div>
                         </div>
@@ -47,13 +47,7 @@
                         </select>
                     </form>
                     <div class="total">
-                        <p id="availability-message">
-                                {% if product_size.quantity > 0 %}
-                                    In stock: {{ product_size.quantity }}
-                                {% else %}
-                                    Out of stock
-                                {% endif %}
-                        </p>
+                        <p id="availability-message"></p>
                         <h4 id="total_price">Total: ${{ product.price }}</h4>
                         <div class="main-border-button"><a href="#">Add To Cart</a></div>
                     </div>
@@ -82,7 +76,6 @@
 {% endblock %}
 {% block custom_scripts %}
 <script>
-
 </script>
 <script>
     const sizeForm = document.getElementById('size-form');
