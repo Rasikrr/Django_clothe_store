@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Categories, Product, ProductSize
+from .models import Categories, Product, ProductSize, Profile
 from .forms import ProductFilterForm, OutwearFilterForm
 from random import sample
 
@@ -25,20 +25,25 @@ def signup(request):
         policy = request.POST.get("policy")
         if password_1 == password_2:
             if User.objects.filter(email=email).exists():
-                messages.info(request, "User with this email is exists")
-                return redirect("signup")
-            elif not policy:
-                messages.info(request, "Please accept policy")
-                return redirect("signup")
+                return messages.info(request, "User with this email is exists")
             else:
-                user = User.objects.create_user(username=name, email=email, password=password_1)
-                user.save()
-                user_login = auth.authenticate(username=name, password=password_1)
-                auth.login(request, user_login)
-                return redirect("index")
+                if policy:
+                    user = User.objects.create_user(username=name, email=email, password=password_1)
+                    user.save()
+                    user_login = auth.authenticate(username=name, password=password_1, email=email)
+                    auth.login(request, user_login)
+
+                    # Create profile
+                    user_model = User.objects.get(email=email)
+                    new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
+                    new_profile.save()
+                    return redirect("index")
+                else:
+                    return messages.info(request, "Please accept policy")
+
         else:
-            messages.info(request, "passwords are not similar")
-            return redirect("signup")
+            return messages.info(request, "Passwords are not similar")
+
     else:
         return render(request, "signup.html")
 

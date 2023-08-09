@@ -3,6 +3,30 @@ from django.contrib.auth import get_user_model
 import uuid
 from datetime import datetime
 
+User = get_user_model()
+
+
+class Profile(models.Model):
+    COUNTRIES = [("Kazahstan", "Kazahstan"),
+                 ("Russia", "Russia"),
+                 ("USA", "USA"),
+                 ("South Korea", "South Korea"),
+                 ("Germany", "Germany"),
+                 ("China", "China"),
+                 ("Kyrgyzstan", "Kyrgyzstan")
+                 ].sort()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    id_user = models.IntegerField()
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    country = models.CharField(max_length=50, choices=COUNTRIES)
+    city = models.CharField(max_length=50)
+    street = models.CharField(max_length=100)
+    mail_index = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} {self.user.email}"
+
 
 class Categories(models.Model):
     name = models.CharField(max_length=100)
