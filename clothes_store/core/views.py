@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
@@ -10,15 +10,54 @@ from random import sample
 
 def index(request):
     men_products = sample(list(Product.objects.filter(sex="man")), k=4)
+    women_products = sample(list(Product.objects.filter(sex="women")), k=4)
     return render(request, "index.html", context={"men_products": men_products,
+                                                  "women_products": women_products,
                                                  })
 
 
 def signup(request):
-    return render(request, "signup.html")
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        password_1 = request.POST.get("password_1")
+        password_2 = request.POST.get("password_2")
+        policy = request.POST.get("policy")
+        if password_1 == password_2:
+            if User.objects.filter(email=email).exists():
+                messages.info(request, "User with this email is exists")
+                return redirect("signup")
+            elif not policy:
+                messages.info(request, "Please accept policy")
+                return redirect("signup")
+            else:
+                user = User.objects.create_user(username=name, email=email, password=password_1)
+                user.save()
+                user_login = auth.authenticate(username=name, password=password_1)
+                auth.login(request, user_login)
+                return redirect("index")
+        else:
+            messages.info(request, "passwords are not similar")
+            return redirect("signup")
+    else:
+        return render(request, "signup.html")
 
 
 def signin(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        user = auth.authenticate(email=email, password=password)
+        print(user)
+
+        if user is not None:
+            auth.login(request, user)
+            return redirect("index")
+        else:
+            messages.info(request, "email or password is incorrect")
+            return redirect("signin")
+
     return render(request, "signin.html")
 
 
