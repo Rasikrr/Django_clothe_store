@@ -83,7 +83,7 @@ def women_outwear(request):
             selected_types = forms.cleaned_data['type_of_outwear']
             products = products.filter(category__name__in=selected_types)
 
-    return render(request, "men_outwear.html", context={"products": products,
+    return render(request, "women_outwear.html", context={"products": products,
                                                         "forms": forms,
                                                         })
 

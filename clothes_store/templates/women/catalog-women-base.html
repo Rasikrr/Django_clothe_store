@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %}
+{% block menu %}
 <div class="dd-menu">
         <ul class="menu">
             <li class="dropdown">
@@ -46,6 +46,8 @@
             </li>
         </ul>
 </div>
+{% endblock %}
+{% block content %}
 <hr style="color: #000; width: 80%">
 {% block category %}
 <h2 class="category">Popular</h2>
