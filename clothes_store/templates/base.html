@@ -68,6 +68,9 @@ https://templatemo.com/tm-571-hexashop
                                     <li><a href="contactus">Contact Us</a></li>
                                 </ul>
                             </li>
+                            <a href="profile/{{user_profile.id_user}}">
+                            <img src="{{user_profile.image.url}}" class="header-avatar" alt="">
+                            </a>
                             <li><a href="#" style="font-size: 25px;"><ion-icon name="cart-outline"></ion-icon></a></li>
                         </ul>
                         <a class='menu-trigger'>
@@ -193,7 +196,13 @@ https://templatemo.com/tm-571-hexashop
     padding: 5px;
     border: 1px solid #ccc;
 }
-
+.header-avatar{
+    max-height: 35px;
+    max-width: 35px;
+    border-radius: 50%;
+    border: 1px solid black;
+    margin: 6px 20px 0 0;
+}
 .search-input {
     flex: 1;
     padding: 5px;

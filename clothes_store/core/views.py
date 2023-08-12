@@ -4,14 +4,18 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Categories, Product, ProductSize, Profile
-from .forms import ProductFilterForm, OutwearFilterForm
+from .forms import ProductFilterForm, OutwearFilterForm, CountryChoiceForm
 from random import sample
 
 
 def index(request):
+    user_object = User.objects.get(username=request.user.username)
+    user_profile = Profile.objects.get(user=user_object)
     men_products = sample(list(Product.objects.filter(sex="man")), k=4)
     women_products = sample(list(Product.objects.filter(sex="women")), k=4)
+    print(men_products, women_products)
     return render(request, "index.html", context={"men_products": men_products,
+                                                  "user_profile": user_profile,
                                                   "women_products": women_products,
                                                  })
 
@@ -25,7 +29,8 @@ def signup(request):
         policy = request.POST.get("policy")
         if password_1 == password_2:
             if User.objects.filter(email=email).exists():
-                return messages.info(request, "User with this email is exists")
+                messages.info(request, "User with this email is exists")
+                return redirect("signup")
             else:
                 if policy:
                     user = User.objects.create_user(username=name, email=email, password=password_1)
@@ -37,13 +42,15 @@ def signup(request):
                     user_model = User.objects.get(email=email)
                     new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
                     new_profile.save()
+                    print("HERE")
                     return redirect("index")
                 else:
-                    return messages.info(request, "Please accept policy")
+                    messages.info(request, "Please accept policy")
+                    return redirect("signup")
 
         else:
-            return messages.info(request, "Passwords are not similar")
-
+            messages.info(request, "Passwords are not similar")
+            return redirect("signup")
     else:
         return render(request, "signup.html")
 
@@ -54,8 +61,6 @@ def signin(request):
         password = request.POST.get("password")
 
         user = auth.authenticate(email=email, password=password)
-        print(user)
-
         if user is not None:
             auth.login(request, user)
             return redirect("index")
@@ -64,6 +69,33 @@ def signin(request):
             return redirect("signin")
 
     return render(request, "signin.html")
+
+
+@login_required(login_url="signin")
+def profile(request, id_user):
+    user_profile = Profile.objects.get(id_user=id_user)
+    if request.method == "POST":
+        first_name = request.POST.get("first-name")
+        last_name = request.POST.get("last-name")
+        image = request.FILES.get("image")
+        if image:
+            user_profile.image = image
+        country = request.POST.get("country")
+        city = request.POST.get("city")
+        street = request.POST.get("street")
+        mail_index = request.POST.get("mail-index")
+        user_profile.first_name = first_name
+        user_profile.last_name = last_name
+        user_profile.country = country
+        user_profile.city = city
+        user_profile.street = street
+        user_profile.mail_index = mail_index
+        user_profile.save()
+        return redirect("profile", id_user=id_user)
+    else:
+        country_form = CountryChoiceForm(request.GET)
+        return render(request, "profile.html", context={"user_profile": user_profile,
+                                                        "country_choice": country_form})
 
 
 def men(request):
@@ -153,3 +185,9 @@ def get_product_size_info(request):
             except (Product.DoesNotExist, ProductSize.DoesNotExist):
                 pass
     return JsonResponse({'availability_message': 'Out of stock'})
+
+
+@login_required(login_url="signin")
+def logout(request):
+    auth.logout(request)
+    return redirect("index")

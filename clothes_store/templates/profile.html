@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="profile-container">
+        <h2>Profile</h2>
+        <form method="POST" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="first-name">First name:</label>
+            <input type="text" id="first-name" name="first-name" required value="{{user_profile.first_name}}">
+
+            <label for="last-name">Last name:</label>
+            <input type="text" id="last-name" name="last-name" required value="{{user_profile.last_name}}">
+
+            <label for="avatar">Profile image:</label>
+            <img src="{{user_profile.image.url}}" style="max-height: 60px; max-width: 30px; margin: 15px 10px">
+            <input type="file" id="avatar" name="image" value="">
+
+            <label for="country">Country:</label>
+            <select id="country" name="country" required>
+                {% if not user_profile.country %}
+                <option value="">Choose Country</option>
+                {% endif %}
+                {% for country in country_choice %}
+                    <option value="{{ country.0 }}" {% if country.0 == user_profile.country %} selected {% endif %}>{{ country.1 }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" required value="{{user_profile.city}}">
+
+            <label for="street">Street:</label>
+            <input type="text" id="street" name="street" required value="{{user_profile.street}}">
+
+            <label for="postal-code">Mail index:</label>
+            <input type="text" id="postal-code" name="mail-index" required value="{{user_profile.mail_index}}">
+
+            <div class="buttons">
+            <button type="submit">Save</button>
+            <p class="logout"><a href="{% url 'logout'%}">Log out</a></p>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block custom_css %}
+<style>
+    .profile-container {
+        max-width: 400px;
+        margin: 0 auto;
+        margin-top: 150px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    input, select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+    button {
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .buttons{
+        display: flex;
+        justify-content: space-between;
+    }
+    .logout{
+        margin: 13px 10px 0 0 ;
+        font-weight: bold;
+    }
+    .logout a{
+        color:red;
+
+    }
+</style>
+{% endblock %}

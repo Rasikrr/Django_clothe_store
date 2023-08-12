@@ -7,18 +7,18 @@ User = get_user_model()
 
 
 class Profile(models.Model):
-    COUNTRIES = [("Kazahstan", "Kazahstan"),
-                 ("Russia", "Russia"),
-                 ("USA", "USA"),
-                 ("South Korea", "South Korea"),
-                 ("Germany", "Germany"),
-                 ("China", "China"),
-                 ("Kyrgyzstan", "Kyrgyzstan")
-                 ].sort()
+    COUNTRIES = [
+        ("Kazakhstan", "Kazakhstan"),
+        ("Russia", "Russia"),
+        ("Germany", "Germany"),
+        ("USA", "USA"),
+        ("China", "China"),
+    ].sort()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     id_user = models.IntegerField()
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to="profile_images", default="img-profile-default.png")
     country = models.CharField(max_length=50, choices=COUNTRIES)
     city = models.CharField(max_length=50)
     street = models.CharField(max_length=100)

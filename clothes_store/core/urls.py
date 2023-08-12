@@ -14,5 +14,7 @@ urlpatterns = [
     path("women/outwear", views.women_outwear, name="women_outwear"),
     path("product/<int:product_id>", views.product_detail, name="product_detail"),
     path('get_product_size_info/', views.get_product_size_info, name='get_product_size_info'),
+    path("profile/<int:id_user>", views.profile, name="profile"),
+    path("logout", views.logout, name="logout")
 
 ]
