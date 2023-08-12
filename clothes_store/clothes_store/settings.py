@@ -74,6 +74,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'clothes_store.wsgi.application'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Стандартный бэкенд через username
+    'clothes_store.authentication.CustomEmailBackend',  # Ваш собственный бэкенд аутентификации через email
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

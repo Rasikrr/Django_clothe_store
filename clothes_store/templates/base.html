@@ -68,9 +68,13 @@ https://templatemo.com/tm-571-hexashop
                                     <li><a href="contactus">Contact Us</a></li>
                                 </ul>
                             </li>
+                            {% if user_profile %}
                             <a href="profile/{{user_profile.id_user}}">
                             <img src="{{user_profile.image.url}}" class="header-avatar" alt="">
                             </a>
+                            {% else %}
+                            <a href="{% url 'signin'%}" style="margin: 8px 10px 0 10px">Sign in</a>
+                            {% endif %}
                             <li><a href="#" style="font-size: 25px;"><ion-icon name="cart-outline"></ion-icon></a></li>
                         </ul>
                         <a class='menu-trigger'>

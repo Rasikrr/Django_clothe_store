@@ -9,11 +9,13 @@ from random import sample
 
 
 def index(request):
-    user_object = User.objects.get(username=request.user.username)
-    user_profile = Profile.objects.get(user=user_object)
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
     men_products = sample(list(Product.objects.filter(sex="man")), k=4)
     women_products = sample(list(Product.objects.filter(sex="women")), k=4)
-    print(men_products, women_products)
     return render(request, "index.html", context={"men_products": men_products,
                                                   "user_profile": user_profile,
                                                   "women_products": women_products,
