@@ -13,7 +13,7 @@ class Profile(models.Model):
         ("Germany", "Germany"),
         ("USA", "USA"),
         ("China", "China"),
-    ].sort()
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     id_user = models.IntegerField()
     first_name = models.CharField(max_length=100)
@@ -39,13 +39,13 @@ class Categories(models.Model):
 class Product(models.Model):
     SEX_CHOICES = [
         ("man", "man"),
-        ("women", "women")
+        ("woman", "woman")
     ]
     name = models.CharField(max_length=100)
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
     image = models.ImageField(upload_to="product_images")
-    sex = models.CharField(max_length=5,choices=SEX_CHOICES)
+    sex = models.CharField(max_length=5, choices=SEX_CHOICES)
     category = models.ForeignKey(Categories, on_delete=models.CASCADE)
 
     def __str__(self):

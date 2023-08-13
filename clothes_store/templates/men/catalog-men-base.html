@@ -8,7 +8,7 @@
                 <button class="dropbtn">Clothes</button>
                 <div class="dropdown-content">
                     <a href="{% url 'men_outwear' %}"><i class="icons fa-sharp fa-light fa-shirt-long-sleeve" style="color: #000000;"></i>Outerwear</a>
-                    <a href="#"><i class="icons fa-light fa-shirt" style="color: #000000;"></i>Shirts, polos, T-shirts</a>
+                    <a href="{% url 'men_shirts' %}"><i class="icons fa-light fa-shirt" style="color: #000000;"></i>Shirts, polo's, T-shirts</a>
                     <a href="#">Pants</a>
                     <a href="#">Shorts</a>
                     <a href="#"><i class="icons fa-light fa-user-tie" style="color: #000000;"></i>Suits</a>
@@ -188,7 +188,7 @@ a{
     flex-direction: column;
     justify-content: center;
     width: 30%;
-    border: 1px solid #ccc;
+    /*border: 1px solid #ccc;*/
     padding: 10px;
     margin-bottom: 20px;
 }

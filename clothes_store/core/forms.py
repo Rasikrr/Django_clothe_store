@@ -25,14 +25,3 @@ class OutwearFilterForm(ProductFilterForm):
     ]
 
     type_of_outwear = forms.MultipleChoiceField(choices=TYPE, required=False)
-
-
-class CountryChoiceForm(forms.Form):
-    COUNTRIES = [
-        ("Kazakhstan", "Kazakhstan"),
-        ("Russia", "Russia"),
-        ("Germany", "Germany"),
-        ("USA", "USA"),
-        ("China", "China"),
-    ]
-    country_choice = forms.ChoiceField(choices=COUNTRIES, required=True)

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Categories, Product, ProductSize, Profile
-from .forms import ProductFilterForm, OutwearFilterForm, CountryChoiceForm
+from .forms import ProductFilterForm, OutwearFilterForm
 from random import sample
 
 
@@ -15,7 +15,7 @@ def index(request):
     except User.DoesNotExist:
         user_profile = ""
     men_products = sample(list(Product.objects.filter(sex="man")), k=4)
-    women_products = sample(list(Product.objects.filter(sex="women")), k=4)
+    women_products = sample(list(Product.objects.filter(sex="woman")), k=4)
     return render(request, "index.html", context={"men_products": men_products,
                                                   "user_profile": user_profile,
                                                   "women_products": women_products,
@@ -95,9 +95,10 @@ def profile(request, id_user):
         user_profile.save()
         return redirect("profile", id_user=id_user)
     else:
-        country_form = CountryChoiceForm(request.GET)
+        country_choice = Profile.COUNTRIES
         return render(request, "profile.html", context={"user_profile": user_profile,
-                                                        "country_choice": country_form})
+                                                        "country_choice": country_choice
+                                                        })
 
 
 def men(request):
@@ -107,7 +108,7 @@ def men(request):
 
 
 def women(request):
-    products = sample(list(Product.objects.filter(sex="women")), k=3)
+    products = sample(list(Product.objects.filter(sex="woman")), k=3)
     return render(request, "women.html", context={"products": products,
                                                   })
 
@@ -146,7 +147,7 @@ def men_outwear(request):
 def women_outwear(request):
     parent_category = Categories.objects.get(name="Outwear")
     all_outwear = Categories.objects.filter(parent_category=parent_category)
-    products = Product.objects.filter(category__in=all_outwear, sex="women")
+    products = Product.objects.filter(category__in=all_outwear, sex="woman")
     forms = OutwearFilterForm(request.GET)
     size_filter = request.GET.get('size')
     sort_filter = request.GET.get('sort')
@@ -162,8 +163,16 @@ def women_outwear(request):
             products = products.filter(category__name__in=selected_types)
 
     return render(request, "women_outwear.html", context={"products": products,
-                                                        "forms": forms,
+                                                          "forms": forms,
                                                         })
+
+
+def men_shirts(request):
+    parent_category = Categories.objects.get(name="Shirts_polos_t-shirts")
+    all_shirts = Categories.objects.filter(parent_category=parent_category)
+    products = Product.objects.filter(category__in=all_shirts, sex="man")
+    return render(request, "men_shirts.html", context={"products": products
+                                                       })
 
 
 def product_detail(request, product_id):
@@ -193,3 +202,4 @@ def get_product_size_info(request):
 def logout(request):
     auth.logout(request)
     return redirect("index")
+
