@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="cart-container">
+    <h1 class="cart-head">Shopping Cart</h1>
+    <div class="cart-items">
+        {% for product in products %}
+        <div class="cart-item">
+            <a href="/product/{{product.product_id.id}}">
+                <img src="{{product.product_id.image.url}}" alt="{{product.product_id.name}}">
+            </a>
+            <div class="item-details">
+                <a href="/product/{{product.product_id.id}}"><h2>{{product.product_id.name}}</h2></a>
+                <p>Price: ${{product.product_id.price}}</p>
+                <p>Quantity: {{product.quantity}}</p>
+            </div>
+            <button class="remove-btn">Remove</button>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="cart-summary">
+        <h3>Cart Summary</h3>
+        <p>Total Items: {{total_items}}</p>
+        <p>Total Price: ${{total_price}}</p>
+        <button class="checkout-btn">Checkout</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_css %}
+<style>
+.cart-container {
+    max-width: 800px;
+    margin: 200px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, h3 {
+    color: #333;
+}
+.cart-head{
+    margin-bottom: 30px;
+
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding-left: 30px;
+}
+
+.cart-item img {
+    width: 80px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.remove-btn {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.cart-summary {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: right;
+}
+
+.checkout-btn {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.checkout-btn:hover {
+    background-color: #2980b9;
+}
+</style>
+{% endblock %}

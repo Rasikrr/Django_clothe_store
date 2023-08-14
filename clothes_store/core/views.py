@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Categories, Product, ProductSize, Profile
+from .models import Categories, Product, ProductSize, Profile, CartItem
 from .forms import ProductFilterForm, OutwearFilterForm
 from random import sample
 
@@ -102,26 +102,54 @@ def profile(request, id_user):
 
 
 def men(request):
-    products = sample(list(Product.objects.filter(sex="man")), k=3)
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
+    products = sample(list(Product.objects.filter(sex="man")), k=12 )
     print(products)
-    return render(request, "men.html", context={"products": products})
+    return render(request, "men.html", context={"products": products,
+                                                "user_profile": user_profile
+                                                })
 
 
 def women(request):
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
     products = sample(list(Product.objects.filter(sex="woman")), k=3)
     return render(request, "women.html", context={"products": products,
+                                                  "user_profile": user_profile
                                                   })
 
 
 def contact(request):
-    return render(request, "contact.html")
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
+    return render(request, "contact.html", context={"user_profile": user_profile})
 
 
 def about(request):
-    return render(request, "about.html")
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
+    return render(request, "about.html", context={"user_profile": user_profile})
 
 
 def men_outwear(request):
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
     parent_category = Categories.objects.get(name="Outwear")
     all_outwear = Categories.objects.filter(parent_category=parent_category)
     products = Product.objects.filter(sex="man", category__in=all_outwear)
@@ -141,10 +169,16 @@ def men_outwear(request):
 
     return render(request, "men_outwear.html", context={"products": products,
                                                         "forms": forms,
+                                                        "user_profile": user_profile
                                                         })
 
 
 def women_outwear(request):
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
     parent_category = Categories.objects.get(name="Outwear")
     all_outwear = Categories.objects.filter(parent_category=parent_category)
     products = Product.objects.filter(category__in=all_outwear, sex="woman")
@@ -164,22 +198,35 @@ def women_outwear(request):
 
     return render(request, "women_outwear.html", context={"products": products,
                                                           "forms": forms,
+                                                          "user_profile": user_profile
                                                         })
 
 
 def men_shirts(request):
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
     parent_category = Categories.objects.get(name="Shirts_polos_t-shirts")
     all_shirts = Categories.objects.filter(parent_category=parent_category)
     products = Product.objects.filter(category__in=all_shirts, sex="man")
-    return render(request, "men_shirts.html", context={"products": products
+    return render(request, "men_shirts.html", context={"products": products,
+                                                       "user_profile": user_profile
                                                        })
 
 
 def product_detail(request, product_id):
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
     product = Product.objects.get(id=product_id)
     sizes = ProductSize.SIZE_CHOICES
     return render(request, "single-product.html", context={"product": product,
                                                            "sizes": sizes,
+                                                           "user_profile": user_profile
                                                            })
 
 
@@ -196,6 +243,34 @@ def get_product_size_info(request):
             except (Product.DoesNotExist, ProductSize.DoesNotExist):
                 pass
     return JsonResponse({'availability_message': 'Out of stock'})
+
+
+def add_to_cart(request, product_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'You have to sign in before adding item to cart'})
+    user_object = request.user
+    product = Product.objects.get(id=product_id)
+    cart_item, created = CartItem.objects.get_or_create(user=user_object, product_id=product)
+
+    if not created:
+        cart_item.quantity += 1
+        cart_item.save()
+
+    return JsonResponse({'message': 'Item added to cart.'})
+
+
+@login_required(login_url="signin")
+def cart(request, id_user):
+    user_profile = Profile.objects.get(id_user=id_user)
+    products = CartItem.objects.filter(user=request.user)
+    total_price = 0
+    for product in products:
+        total_price += product.product_id.price * product.quantity
+    return render(request, "cart.html", context={"user_profile": user_profile,
+                                                 "products": products,
+                                                 "total_items": len(products),
+                                                 "total_price": total_price
+                                                })
 
 
 @login_required(login_url="signin")

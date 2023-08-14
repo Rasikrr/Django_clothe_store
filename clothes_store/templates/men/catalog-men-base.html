@@ -59,7 +59,7 @@
             <a href="{% url 'product_detail' product_id=product.id%}"><img src="{{product.image.url}}" alt="{{product.name}}"></a>
             <a href="{% url 'product_detail' product_id=product.id%}"><h3>{{product.name}}</h3></a>
             <span>{{product.price}}$</span>
-            <button class="add-to-cart-btn"><ion-icon name="bag-add-outline"></ion-icon></button>
+            <a href="{% url 'product_detail' product_id=product.id%}"><button class="add-to-cart-btn"><ion-icon name="bag-add-outline"></ion-icon></button></a>
         </div>
     {% empty %}
         <p style="font-size: 24px; margin: 20px 0 0 50px; font-weight: 700">No products found</p>

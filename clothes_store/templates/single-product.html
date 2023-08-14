@@ -15,7 +15,7 @@
             <div class="col-lg-4">
                 <div class="right-content">
                     <h4>{{product.name}}</h4>
-                    <span class="price">{{product.price}}</span>
+                    <span class="price">${{product.price}}</span>
                     <ul class="stars">
                         <li><i class="fa fa-star"></i></li>
                         <li><i class="fa fa-star"></i></li>
@@ -36,6 +36,7 @@
                             </div>
                         </div>
                     </div>
+                   <div id="message-container"></div>
                    <form id="size-form" method="get">
                         {% csrf_token %}
                         <label for="size">Size:</label>
@@ -47,9 +48,11 @@
                         </select>
                     </form>
                     <div class="total">
-                        <p id="availability-message"></p>
+                        <p id="availability-message" style="font-weight: bold"></p>
                         <h4 id="total_price">Total: ${{ product.price }}</h4>
-                        <div class="main-border-button"><a href="#">Add To Cart</a></div>
+                        <div class="main-border-button">
+                            <button class="add-to-cart-btn" data-product-id="{{ product.id }}">Add to Cart</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -72,10 +75,62 @@
         max-width: 30vw;
         max-height: 80vh;
     }
+    .main-border-button button{
+        padding: 15px;
+        border: 1px solid black;
+        background-color: white;
+    }
+    .main-border-button button:hover{
+        background-color: #848480;
+    }
+    #message-container{
+        margin: 20px 0;
+    }
 </style>
 {% endblock %}
 {% block custom_scripts %}
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+    const messageContainer = document.getElementById("message-container");
+
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener("click", function() {
+            let IsInStock = document.getElementById("availability-message");
+            if (IsInStock.textContent == "Out of stock") {
+                alert("Item is out of stock")
+            } else if(IsInStock.textContent == ""){
+                alert("Please choose size")
+            } else {
+                const productSize = document.getElementById("size")
+                const productId = this.getAttribute("data-product-id");
+                console.log(productId)
+                addToCart(productId);
+            }
+
+        });
+    });
+
+    function addToCart(productId) {
+        fetch(`/add_to_cart/${productId}/`)
+            .then(response => response.json())
+            .then(data => {
+                showMessage(data.message);
+            });
+    }
+    function showMessage(message) {
+        const messageElement = document.createElement("p");
+        if (message == 'You have to sign in before adding item to cart'){
+            alert(message)
+        } else {
+            messageElement.textContent = message;
+            messageContainer.appendChild(messageElement);
+            messageElement.style.color = "green";
+            messageElement.style.fontWeight = "bold";
+        }
+    }
+});
 </script>
 <script>
     const sizeForm = document.getElementById('size-form');
@@ -97,6 +152,11 @@
         .then(data => {
             // Обновляем надпись на основе ответа от сервера
             availabilityMessage.textContent = data.availability_message;
+            if (data.availability_message.includes("In stock")){
+                availabilityMessage.style.color = "green"
+            } else {
+                availabilityMessage.style.color = "red"
+            }
         })
         .catch(error => {
             console.error('Error:', error);
@@ -104,4 +164,5 @@
         });
     });
 </script>
+
 {% endblock %}

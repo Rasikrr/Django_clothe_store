@@ -13,9 +13,11 @@ urlpatterns = [
     path("men/outwear", views.men_outwear, name="men_outwear"),
     path("women/outwear", views.women_outwear, name="women_outwear"),
     path("men/shirts", views.men_shirts, name="men_shirts"),
-    path("product/<int:product_id>", views.product_detail, name="product_detail"),
+    path("product/<int:product_id>/", views.product_detail, name="product_detail"),
     path('get_product_size_info/', views.get_product_size_info, name='get_product_size_info'),
     path("profile/<int:id_user>", views.profile, name="profile"),
+    path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path("cart/<int:id_user>", views.cart, name="cart"),
     path("logout", views.logout, name="logout")
 
 ]
