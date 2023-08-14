@@ -245,18 +245,39 @@ def get_product_size_info(request):
     return JsonResponse({'availability_message': 'Out of stock'})
 
 
-def add_to_cart(request, product_id):
+def add_to_cart(request, product_id, product_size):
+    print(product_id, product_size)
     if not request.user.is_authenticated:
         return JsonResponse({'message': 'You have to sign in before adding item to cart'})
     user_object = request.user
-    product = Product.objects.get(id=product_id)
+    product_object = Product.objects.get(id=product_id)
+    product = ProductSize.objects.get(product=product_object, size=product_size)
     cart_item, created = CartItem.objects.get_or_create(user=user_object, product_id=product)
 
     if not created:
         cart_item.quantity += 1
         cart_item.save()
+        product.quantity -= 1
+        product.save()
 
     return JsonResponse({'message': 'Item added to cart.'})
+
+
+def remove_from_cart(request, product_id, product_size):
+    user_object = request.user
+    product_object = Product.objects.get(id=product_id)
+    product = ProductSize.objects.get(product=product_object, size=product_size)
+    cart_item = CartItem.objects.filter(user=user_object, product_id=product).first()
+    cart_item.quantity -= 1
+    product.quantity += 1
+    quantity = str(cart_item.quantity)
+    if cart_item.quantity == 0:
+        cart_item.delete()
+    else:
+        cart_item.save()
+    product.save()
+    print(quantity)
+    return JsonResponse({'quantity': quantity})
 
 
 @login_required(login_url="signin")
@@ -265,7 +286,7 @@ def cart(request, id_user):
     products = CartItem.objects.filter(user=request.user)
     total_price = 0
     for product in products:
-        total_price += product.product_id.price * product.quantity
+        total_price += product.product_id.product.price * product.quantity
     return render(request, "cart.html", context={"user_profile": user_profile,
                                                  "products": products,
                                                  "total_items": len(products),

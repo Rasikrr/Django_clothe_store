@@ -28,13 +28,7 @@
                         <div class="left-content">
                             <h6>No. of Orders</h6>
                         </div>
-                        <div class="right-content">
-                            <div class="quantity buttons_added">
-                                <input type="button" value="-" class="minus">
-                                <input type="number" step="1" min="1" max="1000" name="quantity" value="1" title="Qty" class="input-text qty text" size="4" pattern="" inputmode="" data-max-quantity="{{ product_size.quantity }}" data-product-id="{{ product_id }}" data-size="">
-                                <input type="button" value="+" class="plus">
-                            </div>
-                        </div>
+
                     </div>
                    <div id="message-container"></div>
                    <form id="size-form" method="get">
@@ -105,15 +99,14 @@ document.addEventListener("DOMContentLoaded", function() {
             } else {
                 const productSize = document.getElementById("size")
                 const productId = this.getAttribute("data-product-id");
-                console.log(productId)
-                addToCart(productId);
+                addToCart(productId, productSize.value);
             }
 
         });
     });
 
-    function addToCart(productId) {
-        fetch(`/add_to_cart/${productId}/`)
+    function addToCart(productId, productSize) {
+        fetch(`/add_to_cart/${productId}&${productSize}`)
             .then(response => response.json())
             .then(data => {
                 showMessage(data.message);

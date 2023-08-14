@@ -60,7 +60,7 @@ class ProductSize(models.Model):
         ('XL', 'XL'),
     ]
 
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     size = models.CharField(max_length=5, choices=SIZE_CHOICES)
     quantity = models.PositiveIntegerField(default=0)
 
@@ -70,5 +70,8 @@ class ProductSize(models.Model):
 
 class CartItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product_id = models.ForeignKey(ProductSize, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"User: {self.user.username},Item: {self.product_id.product.name} {self.product_id.size}"

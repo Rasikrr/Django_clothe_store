@@ -7,22 +7,22 @@
     <div class="cart-items">
         {% for product in products %}
         <div class="cart-item">
-            <a href="/product/{{product.product_id.id}}">
-                <img src="{{product.product_id.image.url}}" alt="{{product.product_id.name}}">
+            <a href="/product/{{product.product_id.product.id}}">
+                <img src="{{product.product_id.product.image.url}}" alt="">
             </a>
             <div class="item-details">
-                <a href="/product/{{product.product_id.id}}"><h2>{{product.product_id.name}}</h2></a>
-                <p>Price: ${{product.product_id.price}}</p>
-                <p>Quantity: {{product.quantity}}</p>
+                <p class="price">Price: ${{product.product_id.product.price}}</p>
+                <p class="size">Size: {{product.product_id.size}}</p>
+                <p class="quantity">Quantity: {{product.quantity}}</p>
             </div>
-            <button class="remove-btn">Remove</button>
+            <button class="remove-btn" data-product-id="{{product.product_id.product.id}}">Remove</button>
         </div>
         {% endfor %}
     </div>
     <div class="cart-summary">
         <h3>Cart Summary</h3>
-        <p>Total Items: {{total_items}}</p>
-        <p>Total Price: ${{total_price}}</p>
+        <p class="total-items">Total Items: {{total_items}}</p>
+        <p class="total-price">Total Price: ${{total_price}}</p>
         <button class="checkout-btn">Checkout</button>
     </div>
 </div>
@@ -94,4 +94,62 @@ h1, h2, h3 {
     background-color: #2980b9;
 }
 </style>
+{% endblock %}
+
+{% block custom_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const removeButtons = document.querySelectorAll(".remove-btn");
+
+
+    removeButtons.forEach(button => {
+        button.addEventListener("click", function() {
+            const size_element = document.querySelector(".size");
+            const size = size_element.textContent[size_element.textContent.length-1]
+            const productId = this.getAttribute("data-product-id")
+
+            removeFromCart(productId, size)
+
+
+        });
+    });
+
+    function removeFromCart(productId, productSize) {
+        fetch(`/remove_from_cart/${productId}&${productSize}`)
+            .then(response => response.json())
+            .then(data => {
+                const cartItem = document.querySelector(`[data-product-id="${productId}"]`).closest(".cart-item");
+                const quantityElement = cartItem.querySelector(".quantity");
+                ChangeData(quantityElement, data.quantity);
+                if (data.quantity === "0") {
+                    cartItem.remove();
+                    const totalItems = document.querySelector(".total-items")
+                    const totalItems_text = totalItems.textContent
+                    totalItems.textContent = `Total Items: ${String(parseInt(totalItems_text[totalItems_text.length-1])-1)}`
+                }
+                updateTotalPrice()
+            });
+    }
+    function ChangeData(quantityElement, quantity) {
+        console.log(quantity)
+        quantityElement.textContent = `Quantity: ${quantity}`;
+    }
+
+    function updateTotalPrice() {
+    const totalPriceElement = document.querySelector(".total-price");
+    const cartItems = document.querySelectorAll(".cart-item");
+    let totalPrice = 0;
+
+    cartItems.forEach(cartItem => {
+        const priceElement = cartItem.querySelector(".price");
+        const quantityElement = cartItem.querySelector(".quantity");
+        const price = parseFloat(priceElement.textContent.split("$")[1]);
+        const quantity = parseInt(quantityElement.textContent.split(":")[1]);
+        totalPrice += price * quantity;
+    });
+
+    totalPriceElement.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
+}
+});
+</script>
 {% endblock %}
