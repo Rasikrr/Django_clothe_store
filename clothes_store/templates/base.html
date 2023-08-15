@@ -55,10 +55,13 @@ https://templatemo.com/tm-571-hexashop
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->
                         <ul class="nav">
+                            <form action="/search" method="POST">
+                            {% csrf_token %}
                             <div class="search-box">
-                                <input type="text" class="search-input" placeholder="Enter a request">
-                            <button class="search-btn">Search</button>
-                        </div>
+                                <input type="text" name="product-name" class="search-input" placeholder="Enter a request">
+                                <button class="search-btn">Search</button>
+                            </div>
+                            </form>
                             <li class="scroll-to-section"><a href="{% url 'men' %}">Men's</a></li>
                             <li class="scroll-to-section"><a href="{% url 'women' %}">Women's</a></li>
                             <li class="submenu">

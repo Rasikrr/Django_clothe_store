@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="payment-container">
+    <h1 class="head">Payment Information</h1>
+    <form class="payment-form">
+        <div class="input-group">
+            <i class="icons fa-brands fa-cc-visa icons"></i><i class="icons fa-brands fa-cc-mastercard"></i><label class="input-label" for="card-number">Card Number:</label>
+            <input class="input-field" type="text" id="card-number" required>
+        </div>
+        <div class="input-group">
+            <i class="fa-regular fa-calendar-days"></i><label class="input-label" for="expiration">Expiration Date:</label>
+            <input class="input-field" type="text" id="expiration" required>
+        </div>
+        <div class="input-group">
+            <i class="icons fa-sharp fa-solid fa-key"></i><label class="input-label" for="cvv">CVV:</label>
+            <input class="input-field" type="text" id="cvv" required>
+        </div>
+        <button class="submit-button" type="submit">Pay Now</button>
+    </form>
+</div>
+
+{% endblock %}
+{% block custom_css %}
+<style>
+    .icons{
+        font-size: 20px;
+        margin-right: 5px;
+    }
+    .head{
+        margin-bottom: 30px;
+    }
+    .payment-container {
+        font-family: Arial, sans-serif;
+        margin: 200px auto;
+        padding: 20px;
+        max-width: 550px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .payment-form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-group {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-label {
+        flex: 1;
+    }
+
+    .input-field {
+        flex: 2;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .submit-button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}

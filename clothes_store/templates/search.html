@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<h2 class="category">Results for: {{search}}</h2>
+<hr class="line">
+<div class="catalog">
+    {% for product in products %}
+        <div class="product">
+            <a href="{% url 'product_detail' product_id=product.id%}"><img src="{{product.image.url}}" alt="{{product.name}}"></a>
+            <a href="{% url 'product_detail' product_id=product.id%}"><h3>{{product.name}}</h3></a>
+            <span>{{product.price}}$</span>
+            <a href="{% url 'product_detail' product_id=product.id%}"><button class="add-to-cart-btn"><ion-icon name="bag-add-outline"></ion-icon></button></a>
+        </div>
+    {% empty %}
+        <p style="font-size: 24px; margin: 20px 0 0 50px; font-weight: 700">No products found</p>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block custom_css %}
+<style>
+.line{
+    max-width: 80%;
+    color: black;
+    display: flex;
+    justify-content: center;
+}
+.category{
+    margin: 20vh 0 0 15vw;
+}
+
+.catalog {
+    margin: 10vh 10vw 0 10vw;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.product {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 30%;
+    /*border: 1px solid #ccc;*/
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.product img {
+    min-width: 100%;
+    max-height: 380px;
+}
+a{
+    text-decoration: none;
+    color: black;
+}
+.product h3 {
+    margin: 10px 0;
+}
+
+.product p {
+    font-size: 14px;
+}
+
+.add-to-cart-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: #000;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.add-to-cart-btn:hover{
+    background-color: #4e555b;
+
+}
+.product:hover {
+    background-color: #f5f5f5;
+}
+</style>
+{% endblock %}

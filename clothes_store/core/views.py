@@ -230,6 +230,22 @@ def product_detail(request, product_id):
                                                            })
 
 
+def search(request):
+    try:
+        user_object = User.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+    except User.DoesNotExist:
+        user_profile = ""
+    if request.method == "POST":
+        product_name = request.POST.get("product-name")
+        products = Product.objects.filter(name__icontains=product_name)
+        return render(request, "search.html", context={"user_profile": user_profile,
+                                                       "products": products,
+                                                       "search": product_name})
+    else:
+        return render(request, "search.html", context={"user_profile": user_profile,
+                                                       })
+
 def get_product_size_info(request):
     if request.method == 'POST':
         product_id = request.GET.get('product_id')
@@ -246,7 +262,6 @@ def get_product_size_info(request):
 
 
 def add_to_cart(request, product_id, product_size):
-    print(product_id, product_size)
     if not request.user.is_authenticated:
         return JsonResponse({'message': 'You have to sign in before adding item to cart'})
     user_object = request.user
@@ -292,6 +307,26 @@ def cart(request, id_user):
                                                  "total_items": len(products),
                                                  "total_price": total_price
                                                 })
+
+
+def check_delivery_data(request, id_user):
+    user_profile = Profile.objects.get(id_user=id_user)
+    first_name = user_profile.first_name
+    last_name = user_profile.last_name
+    country = user_profile.country
+    city = user_profile.city
+    street = user_profile.street
+    mail_index = user_profile.mail_index
+    data = [first_name, last_name, country, city, street, mail_index]
+    if not all(data):
+        return JsonResponse({"response": "not full"})
+    return JsonResponse({"response": "full"})
+
+
+@login_required(login_url="signin")
+def checkout(request):
+    user_profile = Profile.objects.get(user=request.user)
+    return render(request, "checkout.html", context={"user_profile": user_profile})
 
 
 @login_required(login_url="signin")
