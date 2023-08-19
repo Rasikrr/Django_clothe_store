@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Categories, Product, ProductSize, Profile, CartItem
+from .models import Categories, Product, ProductSize, Profile, CartItem, Subscribe
 from .forms import ProductFilterForm, OutwearFilterForm
 from random import sample
 
@@ -14,12 +14,32 @@ def index(request):
         user_profile = Profile.objects.get(user=user_object)
     except User.DoesNotExist:
         user_profile = ""
-    men_products = sample(list(Product.objects.filter(sex="man")), k=4)
-    women_products = sample(list(Product.objects.filter(sex="woman")), k=4)
-    return render(request, "index.html", context={"men_products": men_products,
-                                                  "user_profile": user_profile,
-                                                  "women_products": women_products,
-                                                 })
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        user_object = User.objects.get(username=request.user.username)
+        if Subscribe.objects.filter(user=user_object, email=email).exists():
+            messages.info(request, "Subscriber with this email is exists")
+            return redirect("index")
+        subscriber = Subscribe.objects.create(name=name, email=email, user=user_object, used=False)
+        subscriber.save()
+        return redirect("index")
+    else:
+        men_products = sample(list(Product.objects.filter(sex="man")), k=4)
+        women_products = sample(list(Product.objects.filter(sex="woman")), k=4)
+        try:
+            User.objects.get(username=request.user.username)
+            if Subscribe.objects.filter(user=user_object).exists():
+                show = False
+            else:
+                show = True
+        except User.DoesNotExist:
+            show = False
+        return render(request, "index.html", context={"men_products": men_products,
+                                                      "user_profile": user_profile,
+                                                      "women_products": women_products,
+                                                      "show": show
+                                                     })
 
 
 def signup(request):
@@ -32,6 +52,9 @@ def signup(request):
         if password_1 == password_2:
             if User.objects.filter(email=email).exists():
                 messages.info(request, "User with this email is exists")
+                return redirect("signup")
+            elif User.objects.filter(username=name).exists():
+                messages.info(request, "User with this username is exists")
                 return redirect("signup")
             else:
                 if policy:
@@ -69,8 +92,8 @@ def signin(request):
         else:
             messages.info(request, "email or password is incorrect")
             return redirect("signin")
-
-    return render(request, "signin.html")
+    else:
+        return render(request, "signin.html")
 
 
 @login_required(login_url="signin")
@@ -246,6 +269,7 @@ def search(request):
         return render(request, "search.html", context={"user_profile": user_profile,
                                                        })
 
+
 def get_product_size_info(request):
     if request.method == 'POST':
         product_id = request.GET.get('product_id')
@@ -321,6 +345,13 @@ def check_delivery_data(request, id_user):
     if not all(data):
         return JsonResponse({"response": "not full"})
     return JsonResponse({"response": "full"})
+
+
+def check_total_price(request, total_price):
+    if int(total_price) == 0:
+        print("YES")
+        return JsonResponse({"response": "False"})
+    return JsonResponse({"response": "True"})
 
 
 @login_required(login_url="signin")

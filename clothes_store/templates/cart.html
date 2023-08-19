@@ -12,6 +12,13 @@
                 <button id="goToPageButton" class="my-button">Ok</button>
             </div>
         </div>
+        <div id="myModal1" class="modal-1">
+            <div class="modal-content-1">
+                <span class="close-1">&times;</span>
+                <p>You have to add some items in your cart</p>
+                <button id="goToPageButton-1" class="my-button">Ok</button>
+            </div>
+        </div>
         {% for product in products %}
         <div class="cart-item">
             <a href="/product/{{product.product_id.product.id}}">
@@ -33,6 +40,8 @@
         <button class="checkout-btn" user-profile-id="{{user_profile.id_user}}">Checkout</button>
     </div>
 </div>
+    {% block subscribe %}
+    {% endblock %}
 {% endblock %}
 
 {% block custom_css %}
@@ -100,7 +109,7 @@ h1, h2, h3 {
 .checkout-btn:hover {
     background-color: #2980b9;
 }
-.modal {
+.modal, .modal-1 {
     display: none;
     position: fixed;
     z-index: 1;
@@ -111,7 +120,7 @@ h1, h2, h3 {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal-content {
+.modal-content, .modal-content-1 {
     background-color: #fff;
     margin: 15% auto;
     padding: 20px;
@@ -122,7 +131,7 @@ h1, h2, h3 {
     position: relative;
 }
 
-.close {
+.close, .close-1 {
     position: absolute;
     top: 10px;
     right: 20px;
@@ -151,6 +160,7 @@ h1, h2, h3 {
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const removeButtons = document.querySelectorAll(".remove-btn");
+
 
 
     removeButtons.forEach(button => {
@@ -182,7 +192,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
     function ChangeData(quantityElement, quantity) {
-        console.log(quantity)
         quantityElement.textContent = `Quantity: ${quantity}`;
     }
 
@@ -201,6 +210,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     totalPriceElement.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
 }
+
 });
 </script>
 <script>
@@ -208,19 +218,34 @@ document.addEventListener("DOMContentLoaded", function() {
     const CheckoutButton = document.querySelector(".checkout-btn");
     const modal = document.getElementById("myModal");
     const closeModal = document.querySelector(".close");
+    const closeModal_1 = document.querySelector(".close-1")
     const goToPageButton = document.getElementById("goToPageButton");
-    const id_user = CheckoutButton.getAttribute("user-profile-id")
+    const goToPageButton_1 = document.getElementById("goToPageButton-1")
+    const id_user = CheckoutButton.getAttribute("user-profile-id");
+    const modal_1 = document.getElementById("myModal1")
 
-        CheckoutButton.addEventListener("click", function() {
+        CheckoutButton.addEventListener("click", async function() {
             const id_user = this.getAttribute("user-profile-id")
-            const ans = someFunction(id_user)
+            const totalPrice = document.querySelector(".total-price").textContent.split(":")[1];
+            const TotalPrice = totalPrice.slice(2, totalPrice.length)
+            const ans = await someFunction(id_user);
             console.log(ans)
-            if (ans){
+            if (ans == true) {
+                const response = await someFunction_1(TotalPrice);
+                if (response == true) {
+                    window.location.replace("/checkout");
+                } else {
+                    modal_1.style.display = "block";
+                }
+            }else{
                 modal.style.display = "block";
             }
-
-
         });
+
+        closeModal_1.addEventListener("click", function(){
+            modal_1.style.display = "none";
+        });
+
         closeModal.addEventListener("click", function() {
             modal.style.display = "none";
         });
@@ -228,31 +253,57 @@ document.addEventListener("DOMContentLoaded", function() {
         goToPageButton.addEventListener("click", function() {
             window.location.href = `/profile/${id_user}`;
         });
+
+        goToPageButton_1.addEventListener("click", function() {
+            modal_1.style.display = "none";
+        });
+
     });
 
     function CheckDeliveryData(id_user) {
-        fetch(`/check_delivery_data/${id_user}`)
+    return fetch(`/check_delivery_data/${id_user}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.response == "full"){
+                return true;
+            } else {
+                return false;
+            }
+        });
+}
+
+    function CheckTotalPrice(TotalPrice) {
+        TotalPrice = Math.round(TotalPrice)
+        return fetch(`/check_total_price/${TotalPrice}`)
             .then(response => response.json())
             .then(data => {
-                if (data.response == "full"){
-                    window.location.replace("/checkout")
-                } else{
-                    return data.response;
+                if (data.response == "True"){
+                    return true;
+                } else {
+                    return false;
                 }
-
-
-
-
             });
     }
+
     async function someFunction(id_user) {
-    try {
-        const response = await CheckDeliveryData(id_user);
-        return response;
-    } catch (error) {
-        console.error("Произошла ошибка:", error);
+        try {
+            const response = await CheckDeliveryData(id_user);
+            return response;
+        } catch (error) {
+            console.error("Произошла ошибка:", error);
+            return false;
+        }
     }
-}
+
+    async function someFunction_1(total_price) {
+        try {
+            const response = await CheckTotalPrice(total_price);
+            return response;
+        } catch (error) {
+            console.error("Произошла ошибка:", error);
+            return false;
+        }
+    }
 
 </script>
 {% endblock %}

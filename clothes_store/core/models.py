@@ -75,3 +75,14 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"User: {self.user.username},Item: {self.product_id.product.name} {self.product_id.size}"
+
+
+class Subscribe(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=50)
+    used = models.BooleanField()
+
+    def __str__(self):
+        return f"{self.name} {self.email}"
+
