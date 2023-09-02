@@ -259,5 +259,79 @@ select {
 .btn-submit:hover {
   background-color: #0056b3;
 }
+/* Стили для экранов с шириной менее 768px (мобильные устройства) */
+@media screen and (max-width: 768px) {
+    .dd-menu {
+        margin-top: 10vh;
+        margin-left: 0;
+    }
+
+    .menu li {
+        margin-right: 5vw;
+    }
+
+    .product {
+        width: 100%;
+    }
+
+    /* Другие стили для мобильных устройств */
+}
+
+/* Стили для экранов с шириной от 768px до 1024px (планшеты) */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    /* Ваши стили для планшетов */
+}
+
+/* Стили для экранов с шириной более 1024px (десктопы) */
+@media screen and (min-width: 1025px) {
+    /* Ваши стили для десктопов */
+}
+.menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.menu li {
+    margin-right: 10vw;
+}
+
+.dropbtn {
+    background-color: #fff;
+    color: black;
+    padding: 12px 20px;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+/* Стили для мобильных устройств (медиа-запрос) */
+@media screen and (max-width: 768px) {
+    .menu {
+        flex-direction: column; /* Меняем направление на вертикальное */
+        align-items: center; /* Центрируем элементы по горизонтали */
+    }
+
+    .menu li {
+        margin: 10px 0; /* Уменьшаем вертикальный отступ между элементами */
+    }
+
+    .dropbtn {
+        margin: 5px 0; /* Уменьшаем вертикальный отступ между кнопками */
+        width: 100%; /* Растягиваем кнопки на всю ширину контейнера */
+        text-align: center; /* Выравниваем текст по центру */
+    }
+
+    /* Показываем/скрываем выпадающее меню по клику на кнопку */
+    .dropdown-content {
+        display: none;
+    }
+
+    .menu .dropdown:hover .dropdown-content {
+        display: block;
+    }
+}
 </style>
 {% endblock %}

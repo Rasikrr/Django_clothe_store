@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
 
     <title>Hexashop Ecommerce HTML CSS Template</title>
@@ -55,13 +56,15 @@ https://templatemo.com/tm-571-hexashop
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->
                         <ul class="nav">
-                            <form action="/search" method="POST">
+                            <li>
+                            <form action="/search" method="POST" class="bar">
                             {% csrf_token %}
                             <div class="search-box">
                                 <input type="text" name="product-name" class="search-input" placeholder="Enter a request">
                                 <button class="search-btn">Search</button>
                             </div>
                             </form>
+                            </li>
                             <li class="scroll-to-section"><a href="{% url 'men' %}">Men's</a></li>
                             <li class="scroll-to-section"><a href="{% url 'women' %}">Women's</a></li>
                             <li class="submenu">
@@ -71,10 +74,12 @@ https://templatemo.com/tm-571-hexashop
                                     <li><a href="{% url 'contactus'%}">Contact Us</a></li>
                                 </ul>
                             </li>
+                            <li>
                             {% if user_profile %}
-                            <a href="/profile/{{user_profile.id_user}}">
-                            <img src="{{user_profile.image.url}}" class="header-avatar" alt="">
-                            </a>
+                                <a href="/profile/{{user_profile.id_user}}" class="profile">
+                                <img src="{{user_profile.image.url}}" class="header-avatar" alt="">
+                                </a>
+                            </li>
                             <li><a href="/cart/{{user_profile.id_user}}" style="font-size: 25px;"><ion-icon name="cart-outline"></ion-icon></a></li>
                             {% else %}
                             <a href="{% url 'signin'%}" style="margin: 8px 10px 0 10px">Sign in</a>
@@ -246,9 +251,9 @@ https://templatemo.com/tm-571-hexashop
         });
 
     </script>
-  <style>
-      .search-box {
-          display: flex;
+<style>
+.search-box {
+    display: flex;
     align-items: center;
     max-width: 400px;
     margin: 0 100px 0 0;
@@ -268,7 +273,43 @@ https://templatemo.com/tm-571-hexashop
     border: none;
     outline: none;
 }
+.bar {
+    display: flex;
+    align-items: center;
+    max-width: 400px;
+    margin: 0 100px 0 0;
+    padding: 5px;
+}
 
+/* Стили для поля ввода на мобильных устройствах (ширина меньше 768px) */
+@media screen and (max-width: 768px) {
+    .nav ul li {
+        /*margin: 100px;*/
+    }
+    .search-input {
+        flex: 1;
+        padding: 5px;
+        border: none;
+        outline: none;
+        max-width: 100%; /* Растягиваем поле ввода на всю ширину родительского контейнера */
+    }
+
+    .search-btn {
+        padding: 8px 16px;
+        background-color: black;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5%;
+        margin-left: 5px; /* Добавляем небольшой отступ между полем ввода и кнопкой на мобильных устройствах */
+    }
+    .search-box{
+        margin-left: 10vw;
+    }
+    .profile{
+        margin-left: 5vw;
+    }
+}
 .search-btn {
     padding: 8px 16px;
     background-color: black;
@@ -283,9 +324,29 @@ https://templatemo.com/tm-571-hexashop
 .foot{
     color: white;
 }
-  </style>
+@media screen and (max-width: 768px) {
+    .submenu ul {
+        display: none;
+    }
+}
+</style>
+<script>
+    // Находим все элементы с классом "submenu"
+    let submenus = document.querySelectorAll('.submenu');
 
-  {% block custom_css%}{% endblock %}
-  {% block custom_scripts %}{% endblock %}
-  </body>
-  </html>
+    // Добавляем обработчик события "click" для каждого подменю
+    submenus.forEach(function(submenu) {
+        var link = submenu.querySelector('a');
+        var ul = submenu.querySelector('ul');
+
+        // Добавляем обработчик события "click" на ссылку подменю
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            ul.style.display = ul.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+</script>
+{% block custom_css%}{% endblock %}
+{% block custom_scripts %}{% endblock %}
+</body>
+</html>
